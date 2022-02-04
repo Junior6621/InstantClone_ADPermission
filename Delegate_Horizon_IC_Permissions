@@ -1,0 +1,38 @@
+ #Variables
+$domain = "AD"
+$forest = "domain.local"
+$dc_fqdn = "server.domain.local"
+$usr = "username"
+$ou_to_delegate_control = "OU=VDI,DC=domain,DC=local"
+$domain_fqdn = $domain + "." + $forest
+$domain_dn = (( $domain_fqdn.split(".") ) | % { "DC=" + $_ }) -join ","
+#$dc_fqdn = $dc + "." + $domain_fqdn
+$Computer_GUID = [guid]'bf967a86-0de6-11d0-a285-00aa003049e2'
+$ResetPass_GUID = [guid]'00299570-246d-11d0-a768-00aa006e0529'
+$null_GUID = [guid] '00000000-0000-0000-0000-000000000000'
+
+#Mount PSDrive on the domain
+#New-PSDrive -Name $domain -PSProvider ActiveDirectory -Root "//RootDSE/" -server $dc_fqdn
+ 
+#Get OU ACL
+$acl = Get-ACL $domain':\'$ou_to_delegate_control
+ 
+#Get Group SID
+$s = New-Object System.Security.Principal.SecurityIdentifier (Get-ADUser -Server $dc_fqdn $usr).SID
+ 
+#Add ACL rule for the right "Write/Read all Properties of computer objects"
+$acl.AddAccessRule((New-Object System.DirectoryServices.ActiveDirectoryAccessRule $s,"WriteProperty,ReadProperty","Allow", "Descendent", $Computer_GUID))
+#$acl.AddAccessRule((New-Object System.DirectoryServices.ActiveDirectoryAccessRule $s,"WriteProperty","Allow", $Computer_GUID, "All"))
+
+#Add ACL rule for the right "Reset password"
+$acl.AddAccessRule((New-Object System.DirectoryServices.ActiveDirectoryAccessRule `
+$s,"ExtendedRight","Allow",$ResetPass_GUID,"Descendents",$Computer_GUID))
+
+#Add ACL rule for the right "Create/Delete Computer Accounts.
+$acl.AddAccessRule((New-Object System.DirectoryServices.ActiveDirectoryAccessRule $s,"CreateChild, DeleteChild","Allow",$computer_GUID, "All"))
+
+#Add ACL rule for the right "Default Read Only"
+$acl.AddAccessRule((New-Object System.DirectoryServices.ActiveDirectoryAccessRule $s,"GenericRead","Allow", "All", $null_GUID))
+
+#Apply all ACL rules above	
+Set-ACL $domain":\"$ou_to_delegate_control $acl 
