@@ -3,9 +3,9 @@ $domain = "AD"
 $forest = "domain.local"
 $dc_fqdn = "server.domain.local"
 $usr = "username"
-
-#Compound Variables
 $ou_to_delegate_control = "OU=VDI,DC=domain,DC=local"
+
+#Compound Variables (No Touch)
 $domain_fqdn = $domain + "." + $forest
 $domain_dn = (( $domain_fqdn.split(".") ) | % { "DC=" + $_ }) -join ","
 #$dc_fqdn = $dc + "." + $domain_fqdn
