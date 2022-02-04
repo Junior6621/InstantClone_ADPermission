@@ -21,7 +21,7 @@ $s = New-Object System.Security.Principal.SecurityIdentifier (Get-ADUser -Server
  
 #Add ACL rule for the right "Write/Read all Properties of computer objects"
 $acl.AddAccessRule((New-Object System.DirectoryServices.ActiveDirectoryAccessRule $s,"WriteProperty,ReadProperty","Allow", "Descendent", $Computer_GUID))
-#$acl.AddAccessRule((New-Object System.DirectoryServices.ActiveDirectoryAccessRule $s,"WriteProperty","Allow", $Computer_GUID, "All"))
+
 
 #Add ACL rule for the right "Reset password"
 $acl.AddAccessRule((New-Object System.DirectoryServices.ActiveDirectoryAccessRule `
