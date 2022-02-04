@@ -1,8 +1,10 @@
- #Variables
+ #Variables (Fill Out)
 $domain = "AD"
 $forest = "domain.local"
 $dc_fqdn = "server.domain.local"
 $usr = "username"
+
+#Compound Variables
 $ou_to_delegate_control = "OU=VDI,DC=domain,DC=local"
 $domain_fqdn = $domain + "." + $forest
 $domain_dn = (( $domain_fqdn.split(".") ) | % { "DC=" + $_ }) -join ","
@@ -11,9 +13,6 @@ $Computer_GUID = [guid]'bf967a86-0de6-11d0-a285-00aa003049e2'
 $ResetPass_GUID = [guid]'00299570-246d-11d0-a768-00aa006e0529'
 $null_GUID = [guid] '00000000-0000-0000-0000-000000000000'
 
-#Mount PSDrive on the domain
-#New-PSDrive -Name $domain -PSProvider ActiveDirectory -Root "//RootDSE/" -server $dc_fqdn
- 
 #Get OU ACL
 $acl = Get-ACL $domain':\'$ou_to_delegate_control
  
